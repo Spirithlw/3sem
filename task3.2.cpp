@@ -5,9 +5,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
-#include <wait.h>
-#include <sys/statvfs.h>
-#include <sys/statfs.h>
 
 // USAGE: ./executable COPY_FROM COPY_TO
 
@@ -21,10 +18,8 @@ enum errors
     WRT_ERR = 4,
     DEST_ERR = 5,
     STAT_ERR = 6,
-    MEM_ERR = 7,
-    CHMOD_ERR = 8,
-    UTIMENS_ERR = 9 
-    };    
+    MEM_ERR = 7 
+    };
 
 int main( int argc, char* argv[] )
 {
@@ -59,7 +54,7 @@ int main( int argc, char* argv[] )
             return SOURCE_ERR;
             }    
 
-    int dest_fd = open( argv[2], O_WRONLY | O_TRUNC | O_CREAT , 0600);
+    int dest_fd = open( argv[2], O_WRONLY | O_TRUNC | O_CREAT , 0644);
         if ( dest_fd == -1 )
             {
             perror("Can't open destination file");
@@ -73,11 +68,13 @@ int main( int argc, char* argv[] )
         size_t buf_read = -2;
         size_t written = 0;
         ssize_t res = 0;
+        off_t read_shift = 0;
+        off_t write_shift = 0;
 
         while( true )
         {
             
-            buf_read = read( source_fd, buffer, BUF_SIZE );
+            buf_read = pread( source_fd, buffer, BUF_SIZE, read_shift );
             if ( buf_read == -1)
             {
                 perror("failed to read a block");
@@ -91,11 +88,12 @@ int main( int argc, char* argv[] )
             {
                 break;
             }
+            read_shift += BUF_SIZE;
             
             while( written < buf_read)
             {
 
-                res = write( dest_fd, (const void*) (buffer+written), buf_read - written );
+                res = pwrite( dest_fd, (const void*) (buffer+written), BUF_SIZE - written, write_shift );
                 if (res == -1)
                 {
                     perror("failed to write");
@@ -109,25 +107,12 @@ int main( int argc, char* argv[] )
                 written += res; 
 
             }    
-
+        
+        write_shift += written;
         written = 0;
         }  
 
-    if ( fchmod(dest_fd, stat_buf.st_mode) == -1)
-	{
-		perror("failed to fchmod");
-		return CHMOD_ERR;
-	}
-
-    struct timespec time_array[2] = {stat_buf.st_atim, stat_buf.st_mtim};
     
-    if (futimens(dest_fd, time_array) == -1)
-    {
-        perror("failed to futimens");
-        
-        return UTIMENS_ERR;
-    }
-
     close(source_fd);
     close(dest_fd);
 

@@ -13,7 +13,8 @@ enum errors
     ARG_ERR = 1,
     CRT_ERR = 2,
     SOURCE_ERR = 3,
-    WRT_ERR = 4 
+    WRT_ERR = 4,
+    CLOSE_ERR = 5 
     };  
 
 
@@ -21,12 +22,12 @@ int main( int argc, char* argv[] )
     {
     if ( argc != 3 )
         {
-        printf("The program needs only two argument\n");
+        printf("The program needs only two argument\nUsage: %s FILENAME WHAT_TO_WRITE\n", argv[0] );
 
         return ARG_ERR;
         }
     
-    int create_fd = open( argv[1], O_CREAT | O_RDWR | O_TRUNC, 0600 ); // create();
+    int create_fd = open( argv[1], O_CREAT | O_WRONLY | O_TRUNC, 0600 ); // create();
     if ( create_fd < 0 )
         {
         perror( "Can't create file" );
@@ -35,18 +36,28 @@ int main( int argc, char* argv[] )
         return CRT_ERR;
         }  
 
-    long count = strlen( argv[2] );
-    long res = dprintf( create_fd, "%s\n", argv[2] );
+    size_t count = strlen( argv[2] );
+    int res = dprintf( create_fd, "%s\n", argv[2] );
 
-    if (  res-1 != count )
+    if (  res != count+1 )
         {
+            if ( res < 0 )
+                {
+                perror("output error");    
+                }
+
             perror( "message wrote incorrectly" );
             close ( create_fd );
 
             return WRT_ERR;
         }
         
-    close( create_fd );                
+     if( close( create_fd ) == -1)
+        {
+        perror("close error");
+
+        return CLOSE_ERR;    
+        }                
 
     return 0;    
     }
