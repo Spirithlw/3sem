@@ -30,14 +30,14 @@ const char* file_type(mode_t file_mode)
 {
     switch (file_mode & S_IFMT) 
     {
-	case S_IFBLK:   return "block device";      break;
-	case S_IFCHR:   return "character device";  break;
-	case S_IFDIR:   return "directory";         break;
-	case S_IFIFO:   return "FIFO/pipe";         break;
-        case S_IFLNK:   return "symlink";           break;
-        case S_IFREG:   return "regular file";      break;
-        case S_IFSOCK:  return "socket";            break;
-        default:        return "unknown?";           break;		    	    
+	case S_IFBLK:   return "block device";      
+	case S_IFCHR:   return "character device";  
+	case S_IFDIR:   return "directory";         
+	case S_IFIFO:   return "FIFO/pipe";         
+        case S_IFLNK:   return "symlink";           
+        case S_IFREG:   return "regular file";      
+        case S_IFSOCK:  return "socket";            
+        default:        return "unknown?";           		    	    
     }	    
 }  
 
@@ -45,15 +45,15 @@ const char* dir_type(unsigned char type)
 {
     switch (type)
     {
-        case DT_FIFO:   return "FIFO";                  break;
-        case DT_CHR:    return "CHARACTER SPECIAL";     break;
-        case DT_DIR:    return "DIRECTORY";             break;
-        case DT_BLK:    return "BLOCK SPECIAL";         break;
-        case DT_REG:    return "REGULAR";               break;
-        case DT_LNK:    return "SYMBOLIC LINK";         break;
-        case DT_SOCK:   return "SOCKET";                break;
-        case DT_WHT:    return "WHITEOUT";              break;
-        default:        return "unknown?";              break;
+        case DT_FIFO:   return "FIFO";                  
+        case DT_CHR:    return "CHARACTER SPECIAL";     
+        case DT_DIR:    return "DIRECTORY";             
+        case DT_BLK:    return "BLOCK SPECIAL";         
+        case DT_REG:    return "REGULAR";               
+        case DT_LNK:    return "SYMBOLIC LINK";         
+        case DT_SOCK:   return "SOCKET";                
+        case DT_WHT:    return "WHITEOUT";              
+        default:        return "unknown?";              
     }
 }      
 
@@ -122,7 +122,7 @@ int main( int argc, char* argv[] )
             printf("%-25s", dir_type(dir_str->d_type) );    
         }
         printf("%s\n", dir_str->d_name );
-
+	memset(path_buf, 0, length);
     }
 
     free(path_buf);
