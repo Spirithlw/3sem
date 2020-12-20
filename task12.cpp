@@ -51,7 +51,7 @@ int main( int argc, char** argv )
 
         return MEM_ERR;
     }
-    char* buf = get_current_dir_name();
+    char* buf = get_current_dir_name();//GNU EXTENSION
     if ( buf == nullptr )
     {
         perror("Error");
@@ -86,6 +86,7 @@ int main( int argc, char** argv )
 
     printf("SCHED\nGetpriority: %d\n", getpriority(PRIO_PROCESS, 0)  );
 
+    free(buf);
     return 0;
 }
 
