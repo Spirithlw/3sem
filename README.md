@@ -1,3 +1,3 @@
 # Computer technologies course
 ## I Part
-basics of operarions systems.
+In 3rd semester i studied basics of operarions systems.
