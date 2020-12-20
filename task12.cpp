@@ -11,23 +11,78 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
+enum errors 
+    { 
+    ARG_ERR     = 1,
+    CRT_ERR     = 2,
+    SOURCE_ERR  = 3,
+    WRT_ERR     = 4,
+    DEST_ERR    = 5,
+    STAT_ERR    = 6,
+    MEM_ERR     = 7,
+    CHMOD_ERR   = 8,
+    UTIMENS_ERR = 9,
+    OPEN_ERR    = 10,
+    CLS_ERR     = 11,
+    DRFD_ERR    = 12 
+    };
+
 
 int check( int code, const char* msg);
 
 int main( int argc, char** argv )
 {
-    printf("Command: %s\nPID: %u\nPPID: %u\n", argv[0], getpid(), getppid() );
+    printf("Command: %s\nPID: %u\nPPID: %u\nPGID: %u\nSID: %u\n", argv[0], getpid(), getppid(), 
+    getpgid(getpid()), getsid(getpid()) );
 
     struct passwd* pwd = getpwuid( getuid() ); 
-    gid_t supp_id = getgid();
-    getgroups(1, &supp_id);
+    if (pwd == nullptr )
+    {
+        perror( "Error");
 
-    printf("CWD: %s\nusername: %s\nhome dir: %s\n"
-    "UID: %u\nGID: %u\nFirst supplementary gid: %u\n", get_current_dir_name(), pwd->pw_name, pwd->pw_dir, 
-    pwd->pw_uid, pwd->pw_gid, supp_id );
+        return MEM_ERR;
+    }
+    printf("UID: %u\nUNAME: %u\nGID: %u\n", pwd->pw_uid, pwd->pw_name, pwd->pw_gid );
 
-    struct group* grp = getgrgid( getgid() );
+    struct group* grp = getgrgid( pwd->pw_gid ); 
+    if (pwd == nullptr )
+    {
+        perror( "Error");
+
+        return MEM_ERR;
+    }
+    char* buf = get_current_dir_name();
+    if ( buf == nullptr )
+    {
+        perror("Error");
+
+        return MEM_ERR;
+    }
+
+    printf("CWD: %s\nusername: %s\nhome dir: %s\n", buf, pwd->pw_dir);
+
     printf("Group name: %s\nGroup ID: %u\n", grp->gr_name, grp->gr_gid);
+    gid_t* curr_group = nullptr;
+    size_t group_count = 0;
+    size_t ngroups_max = 0;
+
+    ngroups_max = sysconf(_SC_NGROUPS_MAX) + 1;
+    curr_group = (gid_t *) calloc(ngroups_max *sizeof(gid_t), 1);
+
+    group_count = getgroups(ngroups_max, curr_group);
+    printf("groups:\n");
+    struct group *grps;
+    for (int i = 0; i < group_count; i++)
+    {
+        printf("%u", curr_group[i]);
+        if (!(grps = getgrgid(curr_group[i])) )
+        {
+            printf("error %s;", grps->gr_name);
+        }
+        printf(" %s\n", grps->gr_name);
+
+    }    
+    printf("\n");
 
     printf("SCHED\nGetpriority: %d\n", getpriority(PRIO_PROCESS, 0)  );
 
