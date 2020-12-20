@@ -53,7 +53,7 @@ int main()
     }
     while( true )
     {
-        printf("im alive\n");
+        printf("Still working\n");
         pause();
         switch (RECEIVED_SIGNAL)
         {
