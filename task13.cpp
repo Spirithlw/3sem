@@ -11,7 +11,7 @@ int check( int code);
 
 int main( int argc, char** argv )
 {
-    int curr_pid = check( fork() );
+    pid_t curr_pid = check( fork() );
 
     if ( curr_pid == 0 )
     {
@@ -24,20 +24,36 @@ int main( int argc, char** argv )
     {
         //parent
         int status = 0;
-        int ret_code = wait(&status);
+        int ret_code = waitpid( curr_pid, &status, 0 );
         if ( ret_code == -1 )
         {
             perror("wait");
             exit(EXIT_FAILURE);
         }
+        if (WIFEXITED(status)) 
+        {
+        printf("exited, status=%d\n", WEXITSTATUS(status));
+        } else 
+            if (WIFSIGNALED(status)) 
+            {
+               printf("killed by signal %d\n", WTERMSIG(status));         
+            } else 
+            if (WIFSTOPPED(status))           
+            {
+                printf("stopped by signal %d\n", WSTOPSIG(status));
+            } else 
+                if (WIFCONTINUED(status)) 
+                {
+                    printf("continued\n");
+                }
+
+
         printf("Command: %s - parent\nPID: %u\nPPID: %u\n", argv[0], getpid(), getppid() );
         printf("Child terminated with status: %d\n", status );
 
         return 0;
     }
 
-    printf("\n");
-    return 0;
 }
 
 int check( int code)
