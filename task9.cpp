@@ -35,14 +35,16 @@ int main( int argc, char* argv[] )
     struct statvfs stat_vbf;
     check( statvfs(argv[1], &stat_vbf), "failed to statvfs");
 
-    size_t available = 0, occupied = 0, block = 0, all = 0;
+    size_t available = 0, occupied = 0, block = 0, all = 0, free = 0;
 
     block = stat_vbf.f_frsize;
     all = stat_vbf.f_blocks*block;
     available = stat_vbf.f_bavail*block;
     occupied = (stat_vbf.f_blocks - stat_vbf.f_bfree)*block;
+    free = all - occupied;
 
-    printf("In byte: all - [%lu], available - [%lu], occupied - [%lu]\n", all, available, occupied ); 
+    printf("In byte: all - [%lu], available - [%lu], occupied - [%lu],"
+           " free - [%lu]\n", all, available, occupied, free ); 
 
     return 0;
 }

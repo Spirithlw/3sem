@@ -55,6 +55,7 @@ int main( int argc, char* argv[] )
     printf("UID: %u\n", stat_buf.st_uid);
     printf("GID: %u\n", stat_buf.st_gid);
 
+    printf("Local time.\n");
     printf("Last status change:       %s", ctime(&stat_buf.st_ctime));
     printf("Last file access:         %s", ctime(&stat_buf.st_atime));
     printf("Last file modification:   %s", ctime(&stat_buf.st_mtime));
