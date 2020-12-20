@@ -28,18 +28,18 @@ enum errors
 
 const char* file_type(mode_t file_mode) 
 {
-    	    switch (file_mode & S_IFMT) 
-        {
-		    case S_IFBLK:   return "block device";      break;
-		    case S_IFCHR:   return "character device";  break;
-		    case S_IFDIR:   return "directory";         break;
-		    case S_IFIFO:   return "FIFO/pype";         break;
-		    case S_IFLNK:   return "symlink";           break;
-		    case S_IFREG:   return "regular file";      break;
-		    case S_IFSOCK:  return "socket";            break;
-		    default:        return "unknown";           break;
-	    }
-    }  
+    switch (file_mode & S_IFMT) 
+    {
+	case S_IFBLK:   return "block device";      break;
+	case S_IFCHR:   return "character device";  break;
+	case S_IFDIR:   return "directory";         break;
+	case S_IFIFO:   return "FIFO/pipe";         break;
+        case S_IFLNK:   return "symlink";           break;
+        case S_IFREG:   return "regular file";      break;
+        case S_IFSOCK:  return "socket";            break;
+        default:        return "unknown?";           break;		    	    
+    }	    
+}  
 
 const char* dir_type(unsigned char type)
 {
