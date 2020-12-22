@@ -24,7 +24,7 @@ enum errors
     UTIMENS_ERR = 9,
     OPEN_ERR    = 10,
     CLS_ERR     = 11,
-    DRFD_ERR    = 12 
+    GRP_ERR    = 12 
     };
 
 
@@ -44,6 +44,11 @@ int main( int argc, char** argv )
     }
     printf("UID: %u\nUNAME: %u\nGID: %u\n", pwd->pw_uid, pwd->pw_name, pwd->pw_gid );
 
+    mode_t mask = umask(0);
+    printf("mask: %d\n", (int) mask );
+    umask(mask);
+
+
     struct group* grp = getgrgid( pwd->pw_gid ); 
     if (pwd == nullptr )
     {
@@ -51,7 +56,7 @@ int main( int argc, char** argv )
 
         return MEM_ERR;
     }
-    char* buf = get_current_dir_name();//GNU EXTENSION
+    char* buf = get_current_dir_name();
     if ( buf == nullptr )
     {
         perror("Error");
@@ -67,7 +72,7 @@ int main( int argc, char** argv )
     size_t ngroups_max = 0;
 
     ngroups_max = sysconf(_SC_NGROUPS_MAX) + 1;
-    curr_group = (gid_t *) calloc(ngroups_max *sizeof(gid_t), 1);
+    curr_group = (gid_t *) calloc(ngroups_max , sizeof(gid_t) );
 
     group_count = getgroups(ngroups_max, curr_group);
     printf("groups:\n");
@@ -75,9 +80,11 @@ int main( int argc, char** argv )
     for (int i = 0; i < group_count; i++)
     {
         printf("%u", curr_group[i]);
-        if (!(grps = getgrgid(curr_group[i])) )
+        if (!( grps = getgrgid(curr_group[i]) ) )
         {
             printf("error %s;", grps->gr_name);
+
+            return GRP_ERR;
         }
         printf(" %s\n", grps->gr_name);
 
@@ -86,7 +93,6 @@ int main( int argc, char** argv )
 
     printf("SCHED\nGetpriority: %d\n", getpriority(PRIO_PROCESS, 0)  );
 
-    free(buf);
     return 0;
 }
 
@@ -100,3 +106,4 @@ int check( int code, const char* msg)
 
     return code;
 }
+
