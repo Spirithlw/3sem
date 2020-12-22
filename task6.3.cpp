@@ -13,17 +13,9 @@
 enum errors 
     { 
     ARG_ERR     = 1,
-    CRT_ERR     = 2,
-    SOURCE_ERR  = 3,
-    WRT_ERR     = 4,
-    DEST_ERR    = 5,
-    STAT_ERR    = 6,
-    MEM_ERR     = 7,
-    DIR_ERR     = 8,
-    UTIMENS_ERR = 9,
-    OPEN_ERR    = 10,
-    CLS_ERR     = 11,
-    DRFD_ERR    = 12 
+    STAT_ERR    = 2,
+    DIR_ERR     = 3,
+    DRFD_ERR    = 4 
     };
 
 const char* file_type(mode_t file_mode) 
